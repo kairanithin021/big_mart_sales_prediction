@@ -1,0 +1,1467 @@
+kaira@nithin:~$ ipython
+Python 3.6.5 |Anaconda, Inc.| (default, Apr 29 2018, 16:14:56) 
+Type 'copyright', 'credits' or 'license' for more information
+IPython 6.4.0 -- An enhanced Interactive Python. Type '?' for help.
+
+In [1]: import pandas as pd
+
+In [2]: train=pd.read_csv('/home/kaira/Desktop/Train.csv')
+
+In [3]: test=pd.read_csv('/home/kaira/Desktop/Test.csv')
+
+In [4]: train.head()
+Out[4]: 
+  Item_Identifier  Item_Weight Item_Fat_Content        ...          Outlet_Location_Type        Outlet_Type  Item_Outlet_Sales
+0           FDA15         9.30          Low Fat        ...                        Tier 1  Supermarket Type1          3735.1380
+1           DRC01         5.92          Regular        ...                        Tier 3  Supermarket Type2           443.4228
+2           FDN15        17.50          Low Fat        ...                        Tier 1  Supermarket Type1          2097.2700
+3           FDX07        19.20          Regular        ...                        Tier 3      Grocery Store           732.3800
+4           NCD19         8.93          Low Fat        ...                        Tier 3  Supermarket Type1           994.7052
+
+[5 rows x 12 columns]
+
+In [5]: train.columns
+Out[5]: 
+Index(['Item_Identifier', 'Item_Weight', 'Item_Fat_Content', 'Item_Visibility',
+       'Item_Type', 'Item_MRP', 'Outlet_Identifier',
+       'Outlet_Establishment_Year', 'Outlet_Size', 'Outlet_Location_Type',
+       'Outlet_Type', 'Item_Outlet_Sales'],
+      dtype='object')
+
+In [6]: from sklearn.linear_model import Ridge
+
+In [7]: model=Ridge(alpha=0.05,normalize=True)
+
+In [8]: from sklearn.model_selection import train_test_split
+
+In [9]: X_train,X_test,y_train,y_test=train_test_split()
+---------------------------------------------------------------------------
+ValueError                                Traceback (most recent call last)
+<ipython-input-9-d0ba4fa7aca2> in <module>()
+----> 1 X_train,X_test,y_train,y_test=train_test_split()
+
+~/python/lib/python3.6/site-packages/sklearn/model_selection/_split.py in train_test_split(*arrays, **options)
+   2008     n_arrays = len(arrays)
+   2009     if n_arrays == 0:
+-> 2010         raise ValueError("At least one array required as input")
+   2011     test_size = options.pop('test_size', 'default')
+   2012     train_size = options.pop('train_size', None)
+
+ValueError: At least one array required as input
+
+In [10]: train.head()
+Out[10]: 
+  Item_Identifier  Item_Weight Item_Fat_Content        ...          Outlet_Location_Type        Outlet_Type  Item_Outlet_Sales
+0           FDA15         9.30          Low Fat        ...                        Tier 1  Supermarket Type1          3735.1380
+1           DRC01         5.92          Regular        ...                        Tier 3  Supermarket Type2           443.4228
+2           FDN15        17.50          Low Fat        ...                        Tier 1  Supermarket Type1          2097.2700
+3           FDX07        19.20          Regular        ...                        Tier 3      Grocery Store           732.3800
+4           NCD19         8.93          Low Fat        ...                        Tier 3  Supermarket Type1           994.7052
+
+[5 rows x 12 columns]
+
+In [11]: y=train['Item_Outlet_Sales']
+
+In [12]: X=train.drop('Item_Outlet_Sales')
+---------------------------------------------------------------------------
+KeyError                                  Traceback (most recent call last)
+<ipython-input-12-38759238ba51> in <module>()
+----> 1 X=train.drop('Item_Outlet_Sales')
+
+~/.local/lib/python3.6/site-packages/pandas/core/frame.py in drop(self, labels, axis, index, columns, level, inplace, errors)
+   3695                                            index=index, columns=columns,
+   3696                                            level=level, inplace=inplace,
+-> 3697                                            errors=errors)
+   3698 
+   3699     @rewrite_axis_style_signature('mapper', [('copy', True),
+
+~/.local/lib/python3.6/site-packages/pandas/core/generic.py in drop(self, labels, axis, index, columns, level, inplace, errors)
+   3109         for axis, labels in axes.items():
+   3110             if labels is not None:
+-> 3111                 obj = obj._drop_axis(labels, axis, level=level, errors=errors)
+   3112 
+   3113         if inplace:
+
+~/.local/lib/python3.6/site-packages/pandas/core/generic.py in _drop_axis(self, labels, axis, level, errors)
+   3141                 new_axis = axis.drop(labels, level=level, errors=errors)
+   3142             else:
+-> 3143                 new_axis = axis.drop(labels, errors=errors)
+   3144             result = self.reindex(**{axis_name: new_axis})
+   3145 
+
+~/.local/lib/python3.6/site-packages/pandas/core/indexes/base.py in drop(self, labels, errors)
+   4402             if errors != 'ignore':
+   4403                 raise KeyError(
+-> 4404                     '{} not found in axis'.format(labels[mask]))
+   4405             indexer = indexer[~mask]
+   4406         return self.delete(indexer)
+
+KeyError: "['Item_Outlet_Sales'] not found in axis"
+
+In [13]: X=train.drop('Item_Outlet_Sales',axis=1)
+
+In [14]: model
+Out[14]: 
+Ridge(alpha=0.05, copy_X=True, fit_intercept=True, max_iter=None,
+   normalize=True, random_state=None, solver='auto', tol=0.001)
+
+In [15]: model.fit(X,y)
+---------------------------------------------------------------------------
+ValueError                                Traceback (most recent call last)
+<ipython-input-15-4c1a2828403e> in <module>()
+----> 1 model.fit(X,y)
+
+~/python/lib/python3.6/site-packages/sklearn/linear_model/ridge.py in fit(self, X, y, sample_weight)
+    663         self : returns an instance of self.
+    664         """
+--> 665         return super(Ridge, self).fit(X, y, sample_weight=sample_weight)
+    666 
+    667 
+
+~/python/lib/python3.6/site-packages/sklearn/linear_model/ridge.py in fit(self, X, y, sample_weight)
+    481 
+    482         X, y = check_X_y(X, y, ['csr', 'csc', 'coo'], dtype=_dtype,
+--> 483                          multi_output=True, y_numeric=True)
+    484 
+    485         if ((sample_weight is not None) and
+
+~/python/lib/python3.6/site-packages/sklearn/utils/validation.py in check_X_y(X, y, accept_sparse, dtype, order, copy, force_all_finite, ensure_2d, allow_nd, multi_output, ensure_min_samples, ensure_min_features, y_numeric, warn_on_dtype, estimator)
+    571     X = check_array(X, accept_sparse, dtype, order, copy, force_all_finite,
+    572                     ensure_2d, allow_nd, ensure_min_samples,
+--> 573                     ensure_min_features, warn_on_dtype, estimator)
+    574     if multi_output:
+    575         y = check_array(y, 'csr', force_all_finite=True, ensure_2d=False,
+
+~/python/lib/python3.6/site-packages/sklearn/utils/validation.py in check_array(array, accept_sparse, dtype, order, copy, force_all_finite, ensure_2d, allow_nd, ensure_min_samples, ensure_min_features, warn_on_dtype, estimator)
+    431                                       force_all_finite)
+    432     else:
+--> 433         array = np.array(array, dtype=dtype, order=order, copy=copy)
+    434 
+    435         if ensure_2d:
+
+ValueError: could not convert string to float: 'Supermarket Type1'
+
+In [16]: X.shape
+Out[16]: (8523, 11)
+
+In [17]: X.columns
+Out[17]: 
+Index(['Item_Identifier', 'Item_Weight', 'Item_Fat_Content', 'Item_Visibility',
+       'Item_Type', 'Item_MRP', 'Outlet_Identifier',
+       'Outlet_Establishment_Year', 'Outlet_Size', 'Outlet_Location_Type',
+       'Outlet_Type'],
+      dtype='object')
+
+In [18]: X.head()
+Out[18]: 
+  Item_Identifier  Item_Weight Item_Fat_Content        ...          Outlet_Size Outlet_Location_Type        Outlet_Type
+0           FDA15         9.30          Low Fat        ...               Medium               Tier 1  Supermarket Type1
+1           DRC01         5.92          Regular        ...               Medium               Tier 3  Supermarket Type2
+2           FDN15        17.50          Low Fat        ...               Medium               Tier 1  Supermarket Type1
+3           FDX07        19.20          Regular        ...                  NaN               Tier 3      Grocery Store
+4           NCD19         8.93          Low Fat        ...                 High               Tier 3  Supermarket Type1
+
+[5 rows x 11 columns]
+
+In [19]: ok=X['Outlet_Size']
+
+In [20]: ok=pd.get_dummies(X['Outlet_Size'])
+
+In [21]: ok
+Out[21]: 
+      High  Medium  Small
+0        0       1      0
+1        0       1      0
+2        0       1      0
+3        0       0      0
+4        1       0      0
+5        0       1      0
+6        1       0      0
+7        0       1      0
+8        0       0      0
+9        0       0      0
+10       0       1      0
+11       0       0      1
+12       0       1      0
+13       0       0      1
+14       1       0      0
+15       0       0      1
+16       0       1      0
+17       0       1      0
+18       0       1      0
+19       0       0      1
+20       1       0      0
+21       0       1      0
+22       0       0      1
+23       0       0      1
+24       0       0      1
+25       0       0      0
+26       0       0      1
+27       1       0      0
+28       0       0      0
+29       0       0      1
+...    ...     ...    ...
+8493     0       0      0
+8494     0       0      0
+8495     0       0      1
+8496     0       0      0
+8497     0       0      1
+8498     0       1      0
+8499     0       0      1
+8500     0       0      0
+8501     0       0      0
+8502     0       0      0
+8503     0       0      1
+8504     0       1      0
+8505     0       1      0
+8506     0       1      0
+8507     0       0      1
+8508     0       0      0
+8509     0       0      0
+8510     0       0      1
+8511     0       1      0
+8512     1       0      0
+8513     0       0      1
+8514     0       0      0
+8515     0       1      0
+8516     0       1      0
+8517     0       0      1
+8518     1       0      0
+8519     0       0      0
+8520     0       0      1
+8521     0       1      0
+8522     0       0      1
+
+[8523 rows x 3 columns]
+
+In [22]: type(ok)
+Out[22]: pandas.core.frame.DataFrame
+
+In [23]: ok.drop('small',axis=1,inplace=True)
+---------------------------------------------------------------------------
+KeyError                                  Traceback (most recent call last)
+<ipython-input-23-c28bb54fd4b2> in <module>()
+----> 1 ok.drop('small',axis=1,inplace=True)
+
+~/.local/lib/python3.6/site-packages/pandas/core/frame.py in drop(self, labels, axis, index, columns, level, inplace, errors)
+   3695                                            index=index, columns=columns,
+   3696                                            level=level, inplace=inplace,
+-> 3697                                            errors=errors)
+   3698 
+   3699     @rewrite_axis_style_signature('mapper', [('copy', True),
+
+~/.local/lib/python3.6/site-packages/pandas/core/generic.py in drop(self, labels, axis, index, columns, level, inplace, errors)
+   3109         for axis, labels in axes.items():
+   3110             if labels is not None:
+-> 3111                 obj = obj._drop_axis(labels, axis, level=level, errors=errors)
+   3112 
+   3113         if inplace:
+
+~/.local/lib/python3.6/site-packages/pandas/core/generic.py in _drop_axis(self, labels, axis, level, errors)
+   3141                 new_axis = axis.drop(labels, level=level, errors=errors)
+   3142             else:
+-> 3143                 new_axis = axis.drop(labels, errors=errors)
+   3144             result = self.reindex(**{axis_name: new_axis})
+   3145 
+
+~/.local/lib/python3.6/site-packages/pandas/core/indexes/base.py in drop(self, labels, errors)
+   4402             if errors != 'ignore':
+   4403                 raise KeyError(
+-> 4404                     '{} not found in axis'.format(labels[mask]))
+   4405             indexer = indexer[~mask]
+   4406         return self.delete(indexer)
+
+KeyError: "['small'] not found in axis"
+
+In [24]: ok.drop('Small',axis=1,inplace=True)
+
+In [25]: ok
+Out[25]: 
+      High  Medium
+0        0       1
+1        0       1
+2        0       1
+3        0       0
+4        1       0
+5        0       1
+6        1       0
+7        0       1
+8        0       0
+9        0       0
+10       0       1
+11       0       0
+12       0       1
+13       0       0
+14       1       0
+15       0       0
+16       0       1
+17       0       1
+18       0       1
+19       0       0
+20       1       0
+21       0       1
+22       0       0
+23       0       0
+24       0       0
+25       0       0
+26       0       0
+27       1       0
+28       0       0
+29       0       0
+...    ...     ...
+8493     0       0
+8494     0       0
+8495     0       0
+8496     0       0
+8497     0       0
+8498     0       1
+8499     0       0
+8500     0       0
+8501     0       0
+8502     0       0
+8503     0       0
+8504     0       1
+8505     0       1
+8506     0       1
+8507     0       0
+8508     0       0
+8509     0       0
+8510     0       0
+8511     0       1
+8512     1       0
+8513     0       0
+8514     0       0
+8515     0       1
+8516     0       1
+8517     0       0
+8518     1       0
+8519     0       0
+8520     0       0
+8521     0       1
+8522     0       0
+
+[8523 rows x 2 columns]
+
+In [26]: haha=X.copy()
+
+In [27]: X=pd.concat([X,ok],axis=1)
+
+In [28]: X
+Out[28]: 
+     Item_Identifier  Item_Weight Item_Fat_Content  Item_Visibility   ...   Outlet_Location_Type        Outlet_Type High  Medium
+0              FDA15        9.300          Low Fat         0.016047   ...                 Tier 1  Supermarket Type1    0       1
+1              DRC01        5.920          Regular         0.019278   ...                 Tier 3  Supermarket Type2    0       1
+2              FDN15       17.500          Low Fat         0.016760   ...                 Tier 1  Supermarket Type1    0       1
+3              FDX07       19.200          Regular         0.000000   ...                 Tier 3      Grocery Store    0       0
+4              NCD19        8.930          Low Fat         0.000000   ...                 Tier 3  Supermarket Type1    1       0
+5              FDP36       10.395          Regular         0.000000   ...                 Tier 3  Supermarket Type2    0       1
+6              FDO10       13.650          Regular         0.012741   ...                 Tier 3  Supermarket Type1    1       0
+7              FDP10          NaN          Low Fat         0.127470   ...                 Tier 3  Supermarket Type3    0       1
+8              FDH17       16.200          Regular         0.016687   ...                 Tier 2  Supermarket Type1    0       0
+9              FDU28       19.200          Regular         0.094450   ...                 Tier 2  Supermarket Type1    0       0
+10             FDY07       11.800          Low Fat         0.000000   ...                 Tier 1  Supermarket Type1    0       1
+11             FDA03       18.500          Regular         0.045464   ...                 Tier 1  Supermarket Type1    0       0
+12             FDX32       15.100          Regular         0.100014   ...                 Tier 1  Supermarket Type1    0       1
+13             FDS46       17.600          Regular         0.047257   ...                 Tier 1  Supermarket Type1    0       0
+14             FDF32       16.350          Low Fat         0.068024   ...                 Tier 3  Supermarket Type1    1       0
+15             FDP49        9.000          Regular         0.069089   ...                 Tier 1  Supermarket Type1    0       0
+16             NCB42       11.800          Low Fat         0.008596   ...                 Tier 3  Supermarket Type2    0       1
+17             FDP49        9.000          Regular         0.069196   ...                 Tier 1  Supermarket Type1    0       1
+18             DRI11          NaN          Low Fat         0.034238   ...                 Tier 3  Supermarket Type3    0       1
+19             FDU02       13.350          Low Fat         0.102492   ...                 Tier 2  Supermarket Type1    0       0
+20             FDN22       18.850          Regular         0.138190   ...                 Tier 3  Supermarket Type1    1       0
+21             FDW12          NaN          Regular         0.035400   ...                 Tier 3  Supermarket Type3    0       1
+22             NCB30       14.600          Low Fat         0.025698   ...                 Tier 2  Supermarket Type1    0       0
+23             FDC37          NaN          Low Fat         0.057557   ...                 Tier 1      Grocery Store    0       0
+24             FDR28       13.850          Regular         0.025896   ...                 Tier 1  Supermarket Type1    0       0
+25             NCD06       13.000          Low Fat         0.099887   ...                 Tier 2  Supermarket Type1    0       0
+26             FDV10        7.645          Regular         0.066693   ...                 Tier 2  Supermarket Type1    0       0
+27             DRJ59       11.650          low fat         0.019356   ...                 Tier 3  Supermarket Type1    1       0
+28             FDE51        5.925          Regular         0.161467   ...                 Tier 3      Grocery Store    0       0
+29             FDC14          NaN          Regular         0.072222   ...                 Tier 1      Grocery Store    0       0
+...              ...          ...              ...              ...   ...                    ...                ...  ...     ...
+8493           FDP21        7.420          Regular         0.025886   ...                 Tier 2  Supermarket Type1    0       0
+8494           NCI54       15.200          Low Fat         0.000000   ...                 Tier 2  Supermarket Type1    0       0
+8495           FDE22        9.695          Low Fat         0.029567   ...                 Tier 2  Supermarket Type1    0       0
+8496           FDJ57        7.420          Regular         0.021696   ...                 Tier 2  Supermarket Type1    0       0
+8497           FDT08       13.650          Low Fat         0.049209   ...                 Tier 2  Supermarket Type1    0       0
+8498           NCP54       15.350          Low Fat         0.035293   ...                 Tier 3  Supermarket Type2    0       1
+8499           NCK53       11.600          Low Fat         0.037574   ...                 Tier 2  Supermarket Type1    0       0
+8500           NCQ42       20.350          Low Fat         0.000000   ...                 Tier 2  Supermarket Type1    0       0
+8501           FDW21        5.340          Regular         0.005998   ...                 Tier 2  Supermarket Type1    0       0
+8502           NCH43        8.420          Low Fat         0.070712   ...                 Tier 2  Supermarket Type1    0       0
+8503           FDQ44       20.500          Low Fat         0.036133   ...                 Tier 2  Supermarket Type1    0       0
+8504           NCN18          NaN          Low Fat         0.124111   ...                 Tier 3  Supermarket Type3    0       1
+8505           FDB46       10.500          Regular         0.094146   ...                 Tier 3  Supermarket Type2    0       1
+8506           DRF37       17.250          Low Fat         0.084676   ...                 Tier 3  Supermarket Type2    0       1
+8507           FDN28        5.880          Regular         0.030242   ...                 Tier 2  Supermarket Type1    0       0
+8508           FDW31       11.350          Regular         0.043246   ...                 Tier 2  Supermarket Type1    0       0
+8509           FDG45        8.100          Low Fat         0.214306   ...                 Tier 3      Grocery Store    0       0
+8510           FDN58       13.800          Regular         0.056862   ...                 Tier 2  Supermarket Type1    0       0
+8511           FDF05       17.500          Low Fat         0.026980   ...                 Tier 3  Supermarket Type2    0       1
+8512           FDR26       20.700          Low Fat         0.042801   ...                 Tier 3  Supermarket Type1    1       0
+8513           FDH31       12.000          Regular         0.020407   ...                 Tier 2  Supermarket Type1    0       0
+8514           FDA01       15.000          Regular         0.054489   ...                 Tier 2  Supermarket Type1    0       0
+8515           FDH24       20.700          Low Fat         0.021518   ...                 Tier 3  Supermarket Type2    0       1
+8516           NCJ19       18.600          Low Fat         0.118661   ...                 Tier 3  Supermarket Type2    0       1
+8517           FDF53       20.750              reg         0.083607   ...                 Tier 1  Supermarket Type1    0       0
+8518           FDF22        6.865          Low Fat         0.056783   ...                 Tier 3  Supermarket Type1    1       0
+8519           FDS36        8.380          Regular         0.046982   ...                 Tier 2  Supermarket Type1    0       0
+8520           NCJ29       10.600          Low Fat         0.035186   ...                 Tier 2  Supermarket Type1    0       0
+8521           FDN46        7.210          Regular         0.145221   ...                 Tier 3  Supermarket Type2    0       1
+8522           DRG01       14.800          Low Fat         0.044878   ...                 Tier 1  Supermarket Type1    0       0
+
+[8523 rows x 13 columns]
+
+In [29]: X.head()
+Out[29]: 
+  Item_Identifier  Item_Weight Item_Fat_Content  Item_Visibility   ...   Outlet_Location_Type        Outlet_Type High  Medium
+0           FDA15         9.30          Low Fat         0.016047   ...                 Tier 1  Supermarket Type1    0       1
+1           DRC01         5.92          Regular         0.019278   ...                 Tier 3  Supermarket Type2    0       1
+2           FDN15        17.50          Low Fat         0.016760   ...                 Tier 1  Supermarket Type1    0       1
+3           FDX07        19.20          Regular         0.000000   ...                 Tier 3      Grocery Store    0       0
+4           NCD19         8.93          Low Fat         0.000000   ...                 Tier 3  Supermarket Type1    1       0
+
+[5 rows x 13 columns]
+
+In [30]: X.drop('Outlet_Size',axis=1,inplace=True)
+
+In [31]: X.head()
+Out[31]: 
+  Item_Identifier  Item_Weight Item_Fat_Content  Item_Visibility   ...   Outlet_Location_Type        Outlet_Type High  Medium
+0           FDA15         9.30          Low Fat         0.016047   ...                 Tier 1  Supermarket Type1    0       1
+1           DRC01         5.92          Regular         0.019278   ...                 Tier 3  Supermarket Type2    0       1
+2           FDN15        17.50          Low Fat         0.016760   ...                 Tier 1  Supermarket Type1    0       1
+3           FDX07        19.20          Regular         0.000000   ...                 Tier 3      Grocery Store    0       0
+4           NCD19         8.93          Low Fat         0.000000   ...                 Tier 3  Supermarket Type1    1       0
+
+[5 rows x 12 columns]
+
+In [32]: haha=X.copy()
+
+In [33]: ok=pd.get_dummies(X['Item_Fat_Content'],axis=1)
+---------------------------------------------------------------------------
+TypeError                                 Traceback (most recent call last)
+<ipython-input-33-fa0d03e2c0ac> in <module>()
+----> 1 ok=pd.get_dummies(X['Item_Fat_Content'],axis=1)
+
+TypeError: get_dummies() got an unexpected keyword argument 'axis'
+
+In [34]: ok=pd.get_dummies(X['Item_Fat_Content'])
+
+In [35]: ok.head()
+Out[35]: 
+   LF  Low Fat  Regular  low fat  reg
+0   0        1        0        0    0
+1   0        0        1        0    0
+2   0        1        0        0    0
+3   0        0        1        0    0
+4   0        1        0        0    0
+
+In [36]: X['Item_Fat_Content'].head(10)
+Out[36]: 
+0    Low Fat
+1    Regular
+2    Low Fat
+3    Regular
+4    Low Fat
+5    Regular
+6    Regular
+7    Low Fat
+8    Regular
+9    Regular
+Name: Item_Fat_Content, dtype: object
+
+In [37]: X['Item_Fat_Content'].head(20)
+Out[37]: 
+0     Low Fat
+1     Regular
+2     Low Fat
+3     Regular
+4     Low Fat
+5     Regular
+6     Regular
+7     Low Fat
+8     Regular
+9     Regular
+10    Low Fat
+11    Regular
+12    Regular
+13    Regular
+14    Low Fat
+15    Regular
+16    Low Fat
+17    Regular
+18    Low Fat
+19    Low Fat
+Name: Item_Fat_Content, dtype: object
+
+In [38]: ok.isnull().any()
+Out[38]: 
+LF         False
+Low Fat    False
+Regular    False
+low fat    False
+reg        False
+dtype: bool
+
+In [39]: ok.drop(['LF','low fat','reg'],axis=1,inplace=True)
+
+In [40]: ok.head()
+Out[40]: 
+   Low Fat  Regular
+0        1        0
+1        0        1
+2        1        0
+3        0        1
+4        1        0
+
+In [41]: ok.drop('Regular',axis=1,inplace=True)
+
+In [42]: ok.head()
+Out[42]: 
+   Low Fat
+0        1
+1        0
+2        1
+3        0
+4        1
+
+In [43]: X=pd.concat([X,ok],axis=1)
+
+In [44]: X.head()
+Out[44]: 
+  Item_Identifier  Item_Weight Item_Fat_Content  Item_Visibility   ...           Outlet_Type  High Medium  Low Fat
+0           FDA15         9.30          Low Fat         0.016047   ...     Supermarket Type1     0      1        1
+1           DRC01         5.92          Regular         0.019278   ...     Supermarket Type2     0      1        0
+2           FDN15        17.50          Low Fat         0.016760   ...     Supermarket Type1     0      1        1
+3           FDX07        19.20          Regular         0.000000   ...         Grocery Store     0      0        0
+4           NCD19         8.93          Low Fat         0.000000   ...     Supermarket Type1     1      0        1
+
+[5 rows x 13 columns]
+
+In [45]: X.drop('Item_Fat_Content',axis=1,inplace=True)
+
+In [46]: X.head()
+Out[46]: 
+  Item_Identifier  Item_Weight  Item_Visibility              Item_Type   ...          Outlet_Type High  Medium Low Fat
+0           FDA15         9.30         0.016047                  Dairy   ...    Supermarket Type1    0       1       1
+1           DRC01         5.92         0.019278            Soft Drinks   ...    Supermarket Type2    0       1       0
+2           FDN15        17.50         0.016760                   Meat   ...    Supermarket Type1    0       1       1
+3           FDX07        19.20         0.000000  Fruits and Vegetables   ...        Grocery Store    0       0       0
+4           NCD19         8.93         0.000000              Household   ...    Supermarket Type1    1       0       1
+
+[5 rows x 12 columns]
+
+In [47]: haha=X.copy()
+
+In [48]: X.drop('Item_Identifier',axis=1,inplace=True)
+
+In [49]: X.head()
+Out[49]: 
+   Item_Weight  Item_Visibility              Item_Type  Item_MRP   ...          Outlet_Type  High Medium Low Fat
+0         9.30         0.016047                  Dairy  249.8092   ...    Supermarket Type1     0      1       1
+1         5.92         0.019278            Soft Drinks   48.2692   ...    Supermarket Type2     0      1       0
+2        17.50         0.016760                   Meat  141.6180   ...    Supermarket Type1     0      1       1
+3        19.20         0.000000  Fruits and Vegetables  182.0950   ...        Grocery Store     0      0       0
+4         8.93         0.000000              Household   53.8614   ...    Supermarket Type1     1      0       1
+
+[5 rows x 11 columns]
+
+In [50]: X['Item_Type'].head(10)
+Out[50]: 
+0                    Dairy
+1              Soft Drinks
+2                     Meat
+3    Fruits and Vegetables
+4                Household
+5             Baking Goods
+6              Snack Foods
+7              Snack Foods
+8             Frozen Foods
+9             Frozen Foods
+Name: Item_Type, dtype: object
+
+In [51]: X['Item_Type'].head(20)
+Out[51]: 
+0                     Dairy
+1               Soft Drinks
+2                      Meat
+3     Fruits and Vegetables
+4                 Household
+5              Baking Goods
+6               Snack Foods
+7               Snack Foods
+8              Frozen Foods
+9              Frozen Foods
+10    Fruits and Vegetables
+11                    Dairy
+12    Fruits and Vegetables
+13              Snack Foods
+14    Fruits and Vegetables
+15                Breakfast
+16       Health and Hygiene
+17                Breakfast
+18              Hard Drinks
+19                    Dairy
+Name: Item_Type, dtype: object
+
+In [52]: X['Item_Type'].head(30)
+Out[52]: 
+0                     Dairy
+1               Soft Drinks
+2                      Meat
+3     Fruits and Vegetables
+4                 Household
+5              Baking Goods
+6               Snack Foods
+7               Snack Foods
+8              Frozen Foods
+9              Frozen Foods
+10    Fruits and Vegetables
+11                    Dairy
+12    Fruits and Vegetables
+13              Snack Foods
+14    Fruits and Vegetables
+15                Breakfast
+16       Health and Hygiene
+17                Breakfast
+18              Hard Drinks
+19                    Dairy
+20              Snack Foods
+21             Baking Goods
+22                Household
+23             Baking Goods
+24             Frozen Foods
+25                Household
+26              Snack Foods
+27              Hard Drinks
+28                    Dairy
+29                   Canned
+Name: Item_Type, dtype: object
+
+In [53]: ok=X['Item_Type'].head(30)
+
+In [54]: from collections import Counter
+
+In [55]: ok=Counter(ok)
+
+In [56]: ok
+Out[56]: 
+Counter({'Dairy': 4,
+         'Soft Drinks': 1,
+         'Meat': 1,
+         'Fruits and Vegetables': 4,
+         'Household': 3,
+         'Baking Goods': 3,
+         'Snack Foods': 5,
+         'Frozen Foods': 3,
+         'Breakfast': 2,
+         'Health and Hygiene': 1,
+         'Hard Drinks': 2,
+         'Canned': 1})
+
+In [57]: okk=pd.get_dummies(X['Item_Type'])
+
+In [58]: okk.head()
+Out[58]: 
+   Baking Goods  Breads  Breakfast  Canned  Dairy  Frozen Foods      ...        Meat  Others  Seafood  Snack Foods  Soft Drinks  Starchy Foods
+0             0       0          0       0      1             0      ...           0       0        0            0            0              0
+1             0       0          0       0      0             0      ...           0       0        0            0            1              0
+2             0       0          0       0      0             0      ...           1       0        0            0            0              0
+3             0       0          0       0      0             0      ...           0       0        0            0            0              0
+4             0       0          0       0      0             0      ...           0       0        0            0            0              0
+
+[5 rows x 16 columns]
+
+In [59]: ok.shape
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+<ipython-input-59-4c17f994cf57> in <module>()
+----> 1 ok.shape
+
+AttributeError: 'Counter' object has no attribute 'shape'
+
+In [60]: okk.shape
+Out[60]: (8523, 16)
+
+In [61]: okk.columns
+Out[61]: 
+Index(['Baking Goods', 'Breads', 'Breakfast', 'Canned', 'Dairy',
+       'Frozen Foods', 'Fruits and Vegetables', 'Hard Drinks',
+       'Health and Hygiene', 'Household', 'Meat', 'Others', 'Seafood',
+       'Snack Foods', 'Soft Drinks', 'Starchy Foods'],
+      dtype='object')
+
+In [62]: X.head()
+Out[62]: 
+   Item_Weight  Item_Visibility              Item_Type  Item_MRP   ...          Outlet_Type  High Medium Low Fat
+0         9.30         0.016047                  Dairy  249.8092   ...    Supermarket Type1     0      1       1
+1         5.92         0.019278            Soft Drinks   48.2692   ...    Supermarket Type2     0      1       0
+2        17.50         0.016760                   Meat  141.6180   ...    Supermarket Type1     0      1       1
+3        19.20         0.000000  Fruits and Vegetables  182.0950   ...        Grocery Store     0      0       0
+4         8.93         0.000000              Household   53.8614   ...    Supermarket Type1     1      0       1
+
+[5 rows x 11 columns]
+
+In [63]: X['Outlet_Type'].head(10)
+Out[63]: 
+0    Supermarket Type1
+1    Supermarket Type2
+2    Supermarket Type1
+3        Grocery Store
+4    Supermarket Type1
+5    Supermarket Type2
+6    Supermarket Type1
+7    Supermarket Type3
+8    Supermarket Type1
+9    Supermarket Type1
+Name: Outlet_Type, dtype: object
+
+In [64]: ok=pd.get_dummies(X['Outlet_Type'])
+
+In [65]: ok.head()
+Out[65]: 
+   Grocery Store  Supermarket Type1  Supermarket Type2  Supermarket Type3
+0              0                  1                  0                  0
+1              0                  0                  1                  0
+2              0                  1                  0                  0
+3              1                  0                  0                  0
+4              0                  1                  0                  0
+
+In [66]: ok.dro
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+<ipython-input-66-14fa1fc2e734> in <module>()
+----> 1 ok.dro
+
+~/.local/lib/python3.6/site-packages/pandas/core/generic.py in __getattr__(self, name)
+   4374             if self._info_axis._can_hold_identifiers_and_holds_name(name):
+   4375                 return self[name]
+-> 4376             return object.__getattribute__(self, name)
+   4377 
+   4378     def __setattr__(self, name, value):
+
+AttributeError: 'DataFrame' object has no attribute 'dro'
+
+In [67]: ok.drop('Grocery Store',axis=1,inplace=True)
+
+In [68]: ok.head()
+Out[68]: 
+   Supermarket Type1  Supermarket Type2  Supermarket Type3
+0                  1                  0                  0
+1                  0                  1                  0
+2                  1                  0                  0
+3                  0                  0                  0
+4                  1                  0                  0
+
+In [69]: X=pd.concat([X,ok],axis=1)
+
+In [70]: X.head()
+Out[70]: 
+   Item_Weight  Item_Visibility              Item_Type  Item_MRP        ...        Low Fat  Supermarket Type1 Supermarket Type2 Supermarket Type3
+0         9.30         0.016047                  Dairy  249.8092        ...              1                  1                 0                 0
+1         5.92         0.019278            Soft Drinks   48.2692        ...              0                  0                 1                 0
+2        17.50         0.016760                   Meat  141.6180        ...              1                  1                 0                 0
+3        19.20         0.000000  Fruits and Vegetables  182.0950        ...              0                  0                 0                 0
+4         8.93         0.000000              Household   53.8614        ...              1                  1                 0                 0
+
+[5 rows x 14 columns]
+
+In [71]: X.drop('Outlet_Type',axis=1,inplace=True)
+
+In [72]: X.head()
+Out[72]: 
+   Item_Weight  Item_Visibility              Item_Type  Item_MRP        ...         Low Fat  Supermarket Type1 Supermarket Type2  Supermarket Type3
+0         9.30         0.016047                  Dairy  249.8092        ...               1                  1                 0                  0
+1         5.92         0.019278            Soft Drinks   48.2692        ...               0                  0                 1                  0
+2        17.50         0.016760                   Meat  141.6180        ...               1                  1                 0                  0
+3        19.20         0.000000  Fruits and Vegetables  182.0950        ...               0                  0                 0                  0
+4         8.93         0.000000              Household   53.8614        ...               1                  1                 0                  0
+
+[5 rows x 13 columns]
+
+In [73]: X.columns
+Out[73]: 
+Index(['Item_Weight', 'Item_Visibility', 'Item_Type', 'Item_MRP',
+       'Outlet_Identifier', 'Outlet_Establishment_Year',
+       'Outlet_Location_Type', 'High', 'Medium', 'Low Fat',
+       'Supermarket Type1', 'Supermarket Type2', 'Supermarket Type3'],
+      dtype='object')
+
+In [74]: X['Outlet_Identifier'].head()
+Out[74]: 
+0    OUT049
+1    OUT018
+2    OUT049
+3    OUT010
+4    OUT013
+Name: Outlet_Identifier, dtype: object
+
+In [75]: X['Outlet_Identifier'].head(10)
+Out[75]: 
+0    OUT049
+1    OUT018
+2    OUT049
+3    OUT010
+4    OUT013
+5    OUT018
+6    OUT013
+7    OUT027
+8    OUT045
+9    OUT017
+Name: Outlet_Identifier, dtype: object
+
+In [76]: X['Outlet_Identifier'].head(20)
+Out[76]: 
+0     OUT049
+1     OUT018
+2     OUT049
+3     OUT010
+4     OUT013
+5     OUT018
+6     OUT013
+7     OUT027
+8     OUT045
+9     OUT017
+10    OUT049
+11    OUT046
+12    OUT049
+13    OUT046
+14    OUT013
+15    OUT046
+16    OUT018
+17    OUT049
+18    OUT027
+19    OUT035
+Name: Outlet_Identifier, dtype: object
+
+In [77]: ok=pd.get_dummies(X['Outlet_Identifier'])
+
+In [78]: ok.head()
+Out[78]: 
+   OUT010  OUT013  OUT017  OUT018  OUT019  OUT027  OUT035  OUT045  OUT046  OUT049
+0       0       0       0       0       0       0       0       0       0       1
+1       0       0       0       1       0       0       0       0       0       0
+2       0       0       0       0       0       0       0       0       0       1
+3       1       0       0       0       0       0       0       0       0       0
+4       0       1       0       0       0       0       0       0       0       0
+
+In [79]: ok.shape
+Out[79]: (8523, 10)
+
+In [80]: X['Outlet_Establishment_Year'].head()
+Out[80]: 
+0    1999
+1    2009
+2    1999
+3    1998
+4    1987
+Name: Outlet_Establishment_Year, dtype: int64
+
+In [81]: X['Outlet_Establishment_Year'].head(10)
+Out[81]: 
+0    1999
+1    2009
+2    1999
+3    1998
+4    1987
+5    2009
+6    1987
+7    1985
+8    2002
+9    2007
+Name: Outlet_Establishment_Year, dtype: int64
+
+In [82]: X[X['Outlet_Establishment_Year']<=2013].head()
+Out[82]: 
+   Item_Weight  Item_Visibility              Item_Type  Item_MRP        ...         Low Fat  Supermarket Type1 Supermarket Type2  Supermarket Type3
+0         9.30         0.016047                  Dairy  249.8092        ...               1                  1                 0                  0
+1         5.92         0.019278            Soft Drinks   48.2692        ...               0                  0                 1                  0
+2        17.50         0.016760                   Meat  141.6180        ...               1                  1                 0                  0
+3        19.20         0.000000  Fruits and Vegetables  182.0950        ...               0                  0                 0                  0
+4         8.93         0.000000              Household   53.8614        ...               1                  1                 0                  0
+
+[5 rows x 13 columns]
+
+In [83]: X[X['Outlet_Establishment_Year']<=2013]['Outlet_Establishment_Year'].head()
+Out[83]: 
+0    1999
+1    2009
+2    1999
+3    1998
+4    1987
+Name: Outlet_Establishment_Year, dtype: int64
+
+In [84]: X[X['Outlet_Establishment_Year']>=2013]['Outlet_Establishment_Year'].head()
+Out[84]: Series([], Name: Outlet_Establishment_Year, dtype: int64)
+
+In [85]: X[X['Outlet_Establishment_Year']>=2009]['Outlet_Establishment_Year'].head()
+Out[85]: 
+1     2009
+5     2009
+16    2009
+31    2009
+32    2009
+Name: Outlet_Establishment_Year, dtype: int64
+
+In [86]: X[X['Outlet_Establishment_Year']>=2010]['Outlet_Establishment_Year'].head()
+Out[86]: Series([], Name: Outlet_Establishment_Year, dtype: int64)
+
+In [87]: ok=pd.get_dummies(X['Outlet_Establishment_Year'])
+
+In [88]: ok,head()
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+<ipython-input-88-3b7596bac3f4> in <module>()
+----> 1 ok,head()
+
+NameError: name 'head' is not defined
+
+In [89]: ok.head()
+Out[89]: 
+   1985  1987  1997  1998  1999  2002  2004  2007  2009
+0     0     0     0     0     1     0     0     0     0
+1     0     0     0     0     0     0     0     0     1
+2     0     0     0     0     1     0     0     0     0
+3     0     0     0     1     0     0     0     0     0
+4     0     1     0     0     0     0     0     0     0
+
+In [90]: ok.drop(2009,axis=1,inplace=True)
+
+In [91]: haha=X.copy()
+
+In [92]: X=pd.concat([X,ok],axis=1)
+
+In [93]: X.head()
+Out[93]: 
+   Item_Weight  Item_Visibility              Item_Type  Item_MRP Outlet_Identifier  ...   1998 1999  2002  2004  2007
+0         9.30         0.016047                  Dairy  249.8092            OUT049  ...      0    1     0     0     0
+1         5.92         0.019278            Soft Drinks   48.2692            OUT018  ...      0    0     0     0     0
+2        17.50         0.016760                   Meat  141.6180            OUT049  ...      0    1     0     0     0
+3        19.20         0.000000  Fruits and Vegetables  182.0950            OUT010  ...      1    0     0     0     0
+4         8.93         0.000000              Household   53.8614            OUT013  ...      0    0     0     0     0
+
+[5 rows x 21 columns]
+
+In [94]: X.drop('Outlet_Establishment_Year',axis=1,inplace=True)
+
+In [95]: X.shape
+Out[95]: (8523, 20)
+
+In [96]: X.columns
+Out[96]: 
+Index([         'Item_Weight',      'Item_Visibility',            'Item_Type',
+                   'Item_MRP',    'Outlet_Identifier', 'Outlet_Location_Type',
+                       'High',               'Medium',              'Low Fat',
+          'Supermarket Type1',    'Supermarket Type2',    'Supermarket Type3',
+                         1985,                   1987,                   1997,
+                         1998,                   1999,                   2002,
+                         2004,                   2007],
+      dtype='object')
+
+In [97]: X['Outlet_Location_Type'].head()
+Out[97]: 
+0    Tier 1
+1    Tier 3
+2    Tier 1
+3    Tier 3
+4    Tier 3
+Name: Outlet_Location_Type, dtype: object
+
+In [98]: ok=pd.get_dummies(X['Outlet_Location_Type'])
+
+In [99]: ok.head()
+Out[99]: 
+   Tier 1  Tier 2  Tier 3
+0       1       0       0
+1       0       0       1
+2       1       0       0
+3       0       0       1
+4       0       0       1
+
+In [100]: ok.drop('Tier 3',axis=1,inplace=True)
+
+In [101]: ok.head()
+Out[101]: 
+   Tier 1  Tier 2
+0       1       0
+1       0       0
+2       1       0
+3       0       0
+4       0       0
+
+In [102]: haha=X.copy()
+
+In [103]: X=pd.concat([X,ok],axis=1)
+
+In [104]: X.shape
+Out[104]: (8523, 22)
+
+In [105]: X.drop('Tier 3',axis=1,inplace=True)
+---------------------------------------------------------------------------
+KeyError                                  Traceback (most recent call last)
+<ipython-input-105-1eeb14d687b4> in <module>()
+----> 1 X.drop('Tier 3',axis=1,inplace=True)
+
+~/.local/lib/python3.6/site-packages/pandas/core/frame.py in drop(self, labels, axis, index, columns, level, inplace, errors)
+   3695                                            index=index, columns=columns,
+   3696                                            level=level, inplace=inplace,
+-> 3697                                            errors=errors)
+   3698 
+   3699     @rewrite_axis_style_signature('mapper', [('copy', True),
+
+~/.local/lib/python3.6/site-packages/pandas/core/generic.py in drop(self, labels, axis, index, columns, level, inplace, errors)
+   3109         for axis, labels in axes.items():
+   3110             if labels is not None:
+-> 3111                 obj = obj._drop_axis(labels, axis, level=level, errors=errors)
+   3112 
+   3113         if inplace:
+
+~/.local/lib/python3.6/site-packages/pandas/core/generic.py in _drop_axis(self, labels, axis, level, errors)
+   3141                 new_axis = axis.drop(labels, level=level, errors=errors)
+   3142             else:
+-> 3143                 new_axis = axis.drop(labels, errors=errors)
+   3144             result = self.reindex(**{axis_name: new_axis})
+   3145 
+
+~/.local/lib/python3.6/site-packages/pandas/core/indexes/base.py in drop(self, labels, errors)
+   4402             if errors != 'ignore':
+   4403                 raise KeyError(
+-> 4404                     '{} not found in axis'.format(labels[mask]))
+   4405             indexer = indexer[~mask]
+   4406         return self.delete(indexer)
+
+KeyError: "['Tier 3'] not found in axis"
+
+In [106]: X.drop(',axis=1,inplace=True)
+  File "<ipython-input-106-d22277a12c7c>", line 1
+    X.drop(',axis=1,inplace=True)
+                                 ^
+SyntaxError: EOL while scanning string literal
+
+
+In [107]: X.drop('Outlet_Location_Type',axis=1,inplace=True)
+
+In [108]: X.shape
+Out[108]: (8523, 21)
+
+In [109]: X.columns
+Out[109]: 
+Index([      'Item_Weight',   'Item_Visibility',         'Item_Type',
+                'Item_MRP', 'Outlet_Identifier',              'High',
+                  'Medium',           'Low Fat', 'Supermarket Type1',
+       'Supermarket Type2', 'Supermarket Type3',                1985,
+                      1987,                1997,                1998,
+                      1999,                2002,                2004,
+                      2007,            'Tier 1',            'Tier 2'],
+      dtype='object')
+
+In [110]: X.head()
+Out[110]: 
+   Item_Weight  Item_Visibility              Item_Type  Item_MRP Outlet_Identifier  High  Medium   ...    1998  1999  2002  2004  2007  Tier 1  Tier 2
+0         9.30         0.016047                  Dairy  249.8092            OUT049     0       1   ...       0     1     0     0     0       1       0
+1         5.92         0.019278            Soft Drinks   48.2692            OUT018     0       1   ...       0     0     0     0     0       0       0
+2        17.50         0.016760                   Meat  141.6180            OUT049     0       1   ...       0     1     0     0     0       1       0
+3        19.20         0.000000  Fruits and Vegetables  182.0950            OUT010     0       0   ...       1     0     0     0     0       0       0
+4         8.93         0.000000              Household   53.8614            OUT013     1       0   ...       0     0     0     0     0       0       0
+
+[5 rows x 21 columns]
+
+In [111]: X.columns
+Out[111]: 
+Index([      'Item_Weight',   'Item_Visibility',         'Item_Type',
+                'Item_MRP', 'Outlet_Identifier',              'High',
+                  'Medium',           'Low Fat', 'Supermarket Type1',
+       'Supermarket Type2', 'Supermarket Type3',                1985,
+                      1987,                1997,                1998,
+                      1999,                2002,                2004,
+                      2007,            'Tier 1',            'Tier 2'],
+      dtype='object')
+
+In [112]: X['Outlet_Identifier'].head()
+Out[112]: 
+0    OUT049
+1    OUT018
+2    OUT049
+3    OUT010
+4    OUT013
+Name: Outlet_Identifier, dtype: object
+
+In [113]: X.drop('Outlet_Identifier',axis=1,inplace=True)
+
+In [114]: ok=X['Item_Type'].copy()
+
+In [115]: ok
+Out[115]: 
+0                       Dairy
+1                 Soft Drinks
+2                        Meat
+3       Fruits and Vegetables
+4                   Household
+5                Baking Goods
+6                 Snack Foods
+7                 Snack Foods
+8                Frozen Foods
+9                Frozen Foods
+10      Fruits and Vegetables
+11                      Dairy
+12      Fruits and Vegetables
+13                Snack Foods
+14      Fruits and Vegetables
+15                  Breakfast
+16         Health and Hygiene
+17                  Breakfast
+18                Hard Drinks
+19                      Dairy
+20                Snack Foods
+21               Baking Goods
+22                  Household
+23               Baking Goods
+24               Frozen Foods
+25                  Household
+26                Snack Foods
+27                Hard Drinks
+28                      Dairy
+29                     Canned
+                ...          
+8493              Snack Foods
+8494                Household
+8495              Snack Foods
+8496                  Seafood
+8497    Fruits and Vegetables
+8498                Household
+8499       Health and Hygiene
+8500                Household
+8501              Snack Foods
+8502                Household
+8503    Fruits and Vegetables
+8504                Household
+8505              Snack Foods
+8506              Soft Drinks
+8507             Frozen Foods
+8508    Fruits and Vegetables
+8509    Fruits and Vegetables
+8510              Snack Foods
+8511             Frozen Foods
+8512                    Dairy
+8513                     Meat
+8514                   Canned
+8515             Baking Goods
+8516                   Others
+8517             Frozen Foods
+8518              Snack Foods
+8519             Baking Goods
+8520       Health and Hygiene
+8521              Snack Foods
+8522              Soft Drinks
+Name: Item_Type, Length: 8523, dtype: object
+
+In [116]: X.head()
+Out[116]: 
+   Item_Weight  Item_Visibility              Item_Type  Item_MRP  High  Medium  Low Fat   ...    1998  1999  2002  2004  2007  Tier 1  Tier 2
+0         9.30         0.016047                  Dairy  249.8092     0       1        1   ...       0     1     0     0     0       1       0
+1         5.92         0.019278            Soft Drinks   48.2692     0       1        0   ...       0     0     0     0     0       0       0
+2        17.50         0.016760                   Meat  141.6180     0       1        1   ...       0     1     0     0     0       1       0
+3        19.20         0.000000  Fruits and Vegetables  182.0950     0       0        0   ...       1     0     0     0     0       0       0
+4         8.93         0.000000              Household   53.8614     1       0        1   ...       0     0     0     0     0       0       0
+
+[5 rows x 20 columns]
+
+In [117]: X.drop('Item_Type',axis=1,inplace=True)
+
+In [118]: model.fit(X,y)
+---------------------------------------------------------------------------
+ValueError                                Traceback (most recent call last)
+<ipython-input-118-4c1a2828403e> in <module>()
+----> 1 model.fit(X,y)
+
+~/python/lib/python3.6/site-packages/sklearn/linear_model/ridge.py in fit(self, X, y, sample_weight)
+    663         self : returns an instance of self.
+    664         """
+--> 665         return super(Ridge, self).fit(X, y, sample_weight=sample_weight)
+    666 
+    667 
+
+~/python/lib/python3.6/site-packages/sklearn/linear_model/ridge.py in fit(self, X, y, sample_weight)
+    481 
+    482         X, y = check_X_y(X, y, ['csr', 'csc', 'coo'], dtype=_dtype,
+--> 483                          multi_output=True, y_numeric=True)
+    484 
+    485         if ((sample_weight is not None) and
+
+~/python/lib/python3.6/site-packages/sklearn/utils/validation.py in check_X_y(X, y, accept_sparse, dtype, order, copy, force_all_finite, ensure_2d, allow_nd, multi_output, ensure_min_samples, ensure_min_features, y_numeric, warn_on_dtype, estimator)
+    571     X = check_array(X, accept_sparse, dtype, order, copy, force_all_finite,
+    572                     ensure_2d, allow_nd, ensure_min_samples,
+--> 573                     ensure_min_features, warn_on_dtype, estimator)
+    574     if multi_output:
+    575         y = check_array(y, 'csr', force_all_finite=True, ensure_2d=False,
+
+~/python/lib/python3.6/site-packages/sklearn/utils/validation.py in check_array(array, accept_sparse, dtype, order, copy, force_all_finite, ensure_2d, allow_nd, ensure_min_samples, ensure_min_features, warn_on_dtype, estimator)
+    451                              % (array.ndim, estimator_name))
+    452         if force_all_finite:
+--> 453             _assert_all_finite(array)
+    454 
+    455     shape_repr = _shape_repr(array.shape)
+
+~/python/lib/python3.6/site-packages/sklearn/utils/validation.py in _assert_all_finite(X)
+     42             and not np.isfinite(X).all()):
+     43         raise ValueError("Input contains NaN, infinity"
+---> 44                          " or a value too large for %r." % X.dtype)
+     45 
+     46 
+
+ValueError: Input contains NaN, infinity or a value too large for dtype('float64').
+
+In [119]: X.isnull().any()
+Out[119]: 
+Item_Weight           True
+Item_Visibility      False
+Item_MRP             False
+High                 False
+Medium               False
+Low Fat              False
+Supermarket Type1    False
+Supermarket Type2    False
+Supermarket Type3    False
+1985                 False
+1987                 False
+1997                 False
+1998                 False
+1999                 False
+2002                 False
+2004                 False
+2007                 False
+Tier 1               False
+Tier 2               False
+dtype: bool
+
+In [120]: X.isnull().sum()
+Out[120]: 
+Item_Weight          1463
+Item_Visibility         0
+Item_MRP                0
+High                    0
+Medium                  0
+Low Fat                 0
+Supermarket Type1       0
+Supermarket Type2       0
+Supermarket Type3       0
+1985                    0
+1987                    0
+1997                    0
+1998                    0
+1999                    0
+2002                    0
+2004                    0
+2007                    0
+Tier 1                  0
+Tier 2                  0
+dtype: int64
+
+In [121]: X.shape
+Out[121]: (8523, 19)
+
+In [122]: X['Item_Weight'].head(10)
+Out[122]: 
+0     9.300
+1     5.920
+2    17.500
+3    19.200
+4     8.930
+5    10.395
+6    13.650
+7       NaN
+8    16.200
+9    19.200
+Name: Item_Weight, dtype: float64
+
+In [123]: X['Item_Weight'].fillna(X['Item_Weight'].mean())
+Out[123]: 
+0        9.300000
+1        5.920000
+2       17.500000
+3       19.200000
+4        8.930000
+5       10.395000
+6       13.650000
+7       12.857645
+8       16.200000
+9       19.200000
+10      11.800000
+11      18.500000
+12      15.100000
+13      17.600000
+14      16.350000
+15       9.000000
+16      11.800000
+17       9.000000
+18      12.857645
+19      13.350000
+20      18.850000
+21      12.857645
+22      14.600000
+23      12.857645
+24      13.850000
+25      13.000000
+26       7.645000
+27      11.650000
+28       5.925000
+29      12.857645
+          ...    
+8493     7.420000
+8494    15.200000
+8495     9.695000
+8496     7.420000
+8497    13.650000
+8498    15.350000
+8499    11.600000
+8500    20.350000
+8501     5.340000
+8502     8.420000
+8503    20.500000
+8504    12.857645
+8505    10.500000
+8506    17.250000
+8507     5.880000
+8508    11.350000
+8509     8.100000
+8510    13.800000
+8511    17.500000
+8512    20.700000
+8513    12.000000
+8514    15.000000
+8515    20.700000
+8516    18.600000
+8517    20.750000
+8518     6.865000
+8519     8.380000
+8520    10.600000
+8521     7.210000
+8522    14.800000
+Name: Item_Weight, Length: 8523, dtype: float64
+
+In [124]: X['Item_Weight'].fillna(X['Item_Weight'].mean(),inplace=True)
+
+In [125]: X.isnull().any()
+Out[125]: 
+Item_Weight          False
+Item_Visibility      False
+Item_MRP             False
+High                 False
+Medium               False
+Low Fat              False
+Supermarket Type1    False
+Supermarket Type2    False
+Supermarket Type3    False
+1985                 False
+1987                 False
+1997                 False
+1998                 False
+1999                 False
+2002                 False
+2004                 False
+2007                 False
+Tier 1               False
+Tier 2               False
+dtype: bool
+
+In [126]: model.fit(X,y)
+Out[126]: 
+Ridge(alpha=0.05, copy_X=True, fit_intercept=True, max_iter=None,
+   normalize=True, random_state=None, solver='auto', tol=0.001)
+
+In [127]: X_train,X_test,y_train,y_test=train_test_split(X,y,random_state=0,test_size=0.2)
+
+In [128]: model.fit(X_train,y_train)
+Out[128]: 
+Ridge(alpha=0.05, copy_X=True, fit_intercept=True, max_iter=None,
+   normalize=True, random_state=None, solver='auto', tol=0.001)
+
+In [129]: y_model=model.predict(X_test)
+
+In [130]: y_model
+Out[130]: 
+array([2442.06690608, 2514.24157176, 2226.09149232, ..., 4053.15988885,
+       -808.29127754, 5246.65331932])
+
+In [131]: y_test
+Out[131]: 
+4931     1426.1436
+4148     1201.7690
+7423     1836.2764
+4836     2410.8618
+944      1549.9824
+154      3169.2080
+7230     2036.6822
+3472      824.9262
+2294      378.1744
+2588     1573.9512
+2087     2474.7786
+7318      101.8674
+6126      894.8352
+4164     1491.3920
+6572     1390.1904
+693      1707.7770
+1270     1853.5872
+5893     2404.8696
+1624     5528.1374
+5223    12117.5600
+2972     4767.1280
+6814      185.7582
+1555      187.0898
+8275      772.3280
+3760     1324.2762
+3161     2036.6822
+5225     6574.7750
+1570     5285.1204
+4285      773.6596
+1835     6615.3888
+           ...    
+6672     2993.4368
+6601      319.5840
+1421     2375.5744
+1461     3914.9040
+530      1960.7810
+5861     3364.9532
+4291      517.3266
+7924      276.9728
+7112     1278.3360
+1460     4247.8040
+7205     3004.0896
+7890     2554.0088
+291      3866.9664
+3197     3981.4840
+8488     2756.4120
+4348     2048.6666
+1352     2356.9320
+2529     5972.2260
+1710     6769.8544
+2635     5470.8786
+4578     1384.8640
+3363     3572.0170
+6804     1597.9200
+4222     3200.5006
+6472     3202.4980
+4644     3235.7880
+6179      555.2772
+1861     2885.5772
+3598      218.3824
+1523     5478.2024
+Name: Item_Outlet_Sales, Length: 1705, dtype: float64
+
+
+In [132]: a=((y_model-y_test)**2)
+
+In [133]: import numpy as np
+
+In [134]: a=np.mean((y_model-y_test)**2)
+
+In [135]: a
+Out[135]: 1281973.2529240614
+
+In [136]: model.score(X_test,y_test)
+Out[136]: 0.56199698906675
+
+In [139]: 
+
